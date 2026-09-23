@@ -109,9 +109,7 @@ To verify what a running herdr actually reports, inspect the live state:
 
 Pi users who need precise live working/blocked/done status and session references must run
 `herdr integration install pi`; the matching integration is a prerequisite for whichever harness
-is being dispatched. Without it, the board continues in the degraded mode described above. The
-standard E2E uses checked-in fake Pi and Claude executables and is designed
-to exercise watcher status mapping deterministically rather than changing integrations or calling a provider.
+is being dispatched. Without it, the board continues in the degraded mode described above.
 
 ## Protocol 19 delta: additive upstream surface
 
@@ -311,10 +309,9 @@ read-only probe as an end-to-end test result:
   application viewport. Board code treats reads as bounded screen/scrollback
   diagnostics, never as a semantic result or completion channel.
 
-These behaviors motivate the live validation cases around lifecycle signals,
-managed prompt delivery, rescue/resume, plugin opening, and pane reads. The
-provider-free scenarios use disposable sessions and fake harnesses; this page
-makes no claim that a live suite has been run for the current checkout.
+These behaviors should be checked with focused manual validation in a disposable session when a
+change touches them; this page makes no claim that such validation has been run for the current
+checkout.
 
 ## Socket request and subscription bounds
 

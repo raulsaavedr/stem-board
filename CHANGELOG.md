@@ -14,6 +14,10 @@ All notable changes to this project are documented here. The format is based on
 
 - [#2](https://github.com/raulsaavedr/stem-board/pull/2) chore: keep routine CI focused on formatting, linting, and product tests; live scenarios are opt-in diagnostics.
 
+### Removed
+
+- Remove the legacy live-E2E and Python repository-policy harnesses. Rust product tests remain the normal validation path.
+
 ## [0.17.0] - 2026-09-13
 
 ### Added

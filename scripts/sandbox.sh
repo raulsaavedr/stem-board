@@ -19,7 +19,7 @@ DOCKER_DIR="$REPO_ROOT/docker"
 
 usage() {
   cat <<'EOF'
-herdr-board sandbox — isolated Docker environment for gates, e2e, and validation
+herdr-board sandbox — isolated Docker environment for gates and validation
 
 Usage: scripts/sandbox.sh [global flags] <subcommand> [args...]
 
@@ -39,7 +39,7 @@ Subcommands:
   board <args...>            Run a board CLI command in the sandbox environment
   tui                        Open the interactive TUI in the sandbox environment
   agent --provider <p> --allow-network [--model M] [--effort E]
-                             One-shot end-to-end real-provider dispatch in the
+                             One-shot real-provider dispatch in the
                              sandbox (pi|codex|antigravity): a card runs in a
                              dedicated agent container and must finish ok
   agent --allow-network --tui [--seed]
@@ -276,7 +276,7 @@ require_board_binary() {
 # ---------------------------------------------------------------------------
 cmd_gates() {
   sandbox_ready
-  [ "$#" -eq 0 ] || die "gates takes no arguments; run focused e2e scenarios directly from e2e/"
+  [ "$#" -eq 0 ] || die "gates takes no arguments"
   info "running fmt, clippy, and Rust tests offline (network disabled)"
   run_isolated gates.sh
   info "gates: PASS"

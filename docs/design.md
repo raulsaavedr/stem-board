@@ -917,13 +917,14 @@ boundaries are responsibility-oriented: daemon operations/watchers/dispatch/spaw
 app/forms/view, core engine/client, and Herdr events each own their corresponding implementation
 and private tests. This is guidance for ownership, not an exhaustive file list.
 
-herdr panes are fully drivable from the CLI (`pane send-keys` with named keys, `pane send-text`, `pane read`, `workspace create/close`), so the board can be tested end-to-end in a collision-resistant ephemeral named Herdr session plus a disposable workspace created for that test. Every interactive/live test must use both and never a user's live session, workspace, or tab.
+Interactive validation must use a collision-resistant ephemeral named Herdr session plus a
+disposable workspace, never a user's live session, workspace, or tab.
 
 | Level | What | How |
 |---|---|---|
 | 1. Unit | column engine, prompt assembly, queue, transitions | plain Rust tests, in-memory SQLite; no herdr |
 | 2. TUI snapshot | every view/modal/keybind incl. `?` help | ratatui `TestBackend` + fed `KeyEvent`s + `insta` snapshots; no herdr, no terminal |
 | 3. Daemon integration | dispatch → run → done → auto-move, without tokens | config fake harness plus built-in Pi adapter tests; real boardd paths, no provider call |
-| 4. Full E2E | real Herdr wiring | collision-resistant ephemeral named Herdr session plus disposable workspace; the standard suite uses checked-in fake Pi/Claude/Codex/OpenCode/Antigravity (`agy`)/configured harnesses and asserts pane-first placement/prompt/argv contracts against the current Herdr 0.9.0 / protocol 22 gate with zero provider cost. Separate opt-in real-Claude Haiku/low, real-Codex low, and real-OpenCode low smokes are never in `run-all.sh`; each intended contract is one authorized attempt with no retry or fallback (and may incur cost). |
 
-Isolation rules for level 3–4: `BOARD_DB=/tmp/…` + dedicated daemon socket per test run so tests never touch the real board; every interactive/live test must create and use a collision-resistant ephemeral named Herdr session plus a disposable workspace, never a user's session, workspace, or tab. The session may run headlessly in CI, but it must retain the same named-session and workspace requirements.
+Isolation rule for level 3: `BOARD_DB=/tmp/…` plus a dedicated daemon socket per test run so tests
+never touch the real board.

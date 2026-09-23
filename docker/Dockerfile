@@ -28,8 +28,7 @@ RUN rustup component add clippy rustfmt
 
 # Herdr 0.9.0 — one pinned release asset per architecture, verified by
 # SHA-256, exact version string, and socket protocol 22 before the image can
-# be produced. Mirrors the pins enforced by e2e/ci.sh (x86_64) and extends
-# them to aarch64 with the upstream-published digest.
+# be produced for either supported architecture.
 ENV HERDR_VERSION=0.9.0
 ENV HERDR_PROTOCOL=22
 RUN set -eu; \

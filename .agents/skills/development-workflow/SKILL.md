@@ -20,8 +20,8 @@ the thin policy + routing layer on top of it; it does not duplicate the guide.
 ## 1. Hard rules (never negotiate)
 
 1. Every local test run goes through the sandbox:
-   `./scripts/sandbox.sh gates`. Do NOT run `cargo test`, `e2e/run-all.sh`,
-   `e2e/ci.sh`, the TUI, or real-provider agent runs directly against the host.
+   `./scripts/sandbox.sh gates`. Do NOT run `cargo test`, the TUI, or
+   real-provider agent runs directly against the host.
 2. The host is never a test or run target for this repository's own state:
    no host `BOARD_*`, `HERDR_*`, or provider variables are forwarded, no host
    Herdr/board sockets, sessions, workspaces, databases, the Docker socket, or
@@ -48,8 +48,7 @@ sandbox path is strictly safer and strictly equivalent in coverage.
 ./scripts/sandbox.sh gates     # fmt, clippy, and Rust tests, offline
 ```
 
-`gates` runs the isolation self-check, formatting, clippy, and the Rust workspace tests. Live E2E
-scenarios are opt-in diagnostics and are run directly from `e2e/` only when a change needs them.
+`gates` runs the isolation self-check, formatting, clippy, and the Rust workspace tests.
 
 Edits on the host are visible on the next `gates` run **without any image
 rebuild** (the worktree is a read-only bind mount). Repeated runs reuse the
@@ -100,7 +99,7 @@ runs only inside the sandbox; nothing reaches the host provider config.
 
 ```bash
 ./scripts/sandbox.sh artifacts            # copy evidence out (default ~/.cache/herdr-board/sandbox-artifacts/<ts>)
-./scripts/sandbox.sh artifacts ~/e2e-out  # or an explicit destination (never inside the repo)
+./scripts/sandbox.sh artifacts ~/board-artifacts  # or an explicit destination (never inside the repo)
 ./scripts/sandbox.sh selfcheck            # in-container isolation proof (also gate 0 of gates)
 ./scripts/sandbox.sh reset --target       # drop build output only
 ./scripts/sandbox.sh reset --all          # volumes + image for this worktree

@@ -390,8 +390,8 @@ A card selects a **herdr session** (`session`, `null` = the daemon's default ses
   `codex`, `opencode`, and `antigravity` declare it; a `[harness.NAME]` harness declares it with `resume = true`
   and otherwise fails closed. Note that a recorded `session_id` is **not** evidence that a harness
   can resume it: enqueue mints a uuid and persists it even for a configured harness that never
-  receives one, so the capability gate is the only sound signal (verified live in
-  `e2e/27-rescue-dead-pane.sh`). Self-minting harnesses (codex, opencode, and antigravity) add one more
+  receives one, so the capability gate is the only sound signal. Self-minting harnesses (codex,
+  opencode, and antigravity) add one more
   fail-closed rule: a Mint persists `session_id = NULL` until the integration-reported id is
   captured, so a minted run that never reported a session cannot be rescued (`run.focus` refuses
   with error 2 — no recorded conversation id) and the next stage mints fresh instead of

@@ -11,8 +11,7 @@ Feature PRs target the long-lived `dev` branch; `main` is production (branch mod
 Keep the normal loop small: `cargo fmt --all --check`,
 `cargo clippy --workspace --all-targets --all-features -- -D warnings`, and
 `cargo test --workspace --all-features`. `./scripts/sandbox.sh gates` runs that same set in an
-isolated container. Use the optional `e2e/` tools only when a change genuinely needs a live Herdr
-session, and never point them at user data.
+isolated container. Keep validation focused on shipped product behavior.
 
 ## Workspace layout & crate ownership
 
@@ -26,14 +25,12 @@ session, and never point them at user data.
 
 Ownership is strict: edit your crate(s) + append to root `[workspace.dependencies]`. Semantics
 source of truth: `docs/protocol.md` + `docs/design.md`. Docs live in `docs/` (index: `docs/README.md`);
-`schema.sql` is the fresh-schema source of truth and `board-core::db` owns upgrades. Optional live
-scenarios are documented in `e2e/README.md`.
+`schema.sql` is the fresh-schema source of truth and `board-core::db` owns upgrades.
 
 ## Build and test
 
 Tests should exercise product behavior through the smallest useful public surface. Do not add
-repository-policy, documentation-contract, source-shape, or duplicated invariant tests. Ignored
-tests and `e2e/` scenarios are opt-in diagnostics, not blanket merge requirements.
+repository-policy, documentation-contract, source-shape, or duplicated invariant tests.
 
 ## Code ownership
 
@@ -107,7 +104,7 @@ other Herdr version and protocol; re-verify against `api schema` before changing
 wire behavior. **See [`docs/herdr.md`](docs/herdr.md).**
 
 - **Never run destructive herdr commands against a user's workspaces/sessions.** Mutations only
-  against disposable workspaces you created (see `e2e/`). Read-only probes otherwise.
+  against disposable workspaces you created. Read-only probes otherwise.
 - **Agent names are exclusive** while a pane is open. Names are `card-<id>-<column-slug>`; on an
   `agent_name_taken` collision the daemon retries with the `-r<run>` fallback.
 - **Panes don't inherit the workspace's env/cwd.** Managed-agent launch is pane-first:

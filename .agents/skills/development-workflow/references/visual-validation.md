@@ -15,7 +15,7 @@ no-WezTerm-CLI capture helper is `pty-capture.py`.
 
 ## Non-negotiable safety
 
-1. Read repository `AGENTS.md`, `docs/herdr.md`, and `docs/testing.md`
+1. Read repository `AGENTS.md`, `docs/herdr.md`, and `docs/sandbox.md`
    completely (repo-root-relative; `../../../AGENTS.md` also resolves from this
    directory). Treat the board docs as the source of truth for operating the
    board; do not duplicate the general CLI/TUI reference here.

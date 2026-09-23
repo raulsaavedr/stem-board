@@ -39,7 +39,7 @@ scripts/sandbox.sh gates     # normal Rust checks, offline
 1. the safety self-check (see below),
 2. `cargo fmt --all --check`,
 3. `cargo clippy --workspace --all-targets --all-features -- -D warnings`,
-4. `cargo test --workspace --all-features`,
+4. `cargo test --workspace --all-features`.
 The first failing gate is named and the exit code is non-zero. `prepare` is the only step
 that uses the network (dependency fetch + image build); `gates` runs with the
 network disabled entirely and has no LLM cost.
@@ -49,9 +49,6 @@ read-only at `/repo`, so a re-run after an edit needs **no image rebuild**.
 Build output, Cargo caches, databases, sockets, logs, and artifacts live in
 per-worktree Docker volumes outside the repository — repeated runs reuse the
 caches and the repository stays clean.
-
-Focused live scenarios remain available directly through `e2e/run-all.sh`; they are not part of
-the normal `gates` command.
 
 If `Cargo.toml` changed and the lockfile is stale, `prepare` refuses with a
 hint; regenerate it in a network container without ever mounting the repo
@@ -83,11 +80,6 @@ from inside the container: the source mount is read-only, the process is
 non-root, `/proc/self/mountinfo` contains only allowlisted mounts (no docker
 socket anywhere), and network egress is impossible (DNS and TCP probes must
 fail).
-
-The live suite keeps all of its own guards unchanged — ephemeral
-`hb-e2e-<slug>-<pid>-<random64>` Herdr sessions, HMAC identity tokens,
-mutation logging, and the post-run resource audit run exactly as on the host
-or in CI. The sandbox adds isolation around them; it does not replace them.
 
 ## Shell and board CLI use
 
@@ -188,8 +180,8 @@ and copied out with `scripts/sandbox.sh artifacts`.
 ## Artifacts, cache reset, and cleanup
 
 ```bash
-scripts/sandbox.sh artifacts            # copy run/e2e evidence out of the sandbox
-scripts/sandbox.sh artifacts ~/e2e-out  # or to an explicit destination
+scripts/sandbox.sh artifacts                    # copy run evidence out of the sandbox
+scripts/sandbox.sh artifacts ~/board-artifacts  # or to an explicit destination
 scripts/sandbox.sh reset --target       # drop build output only
 scripts/sandbox.sh reset --all          # volumes + image for this worktree
 ```
@@ -236,9 +228,8 @@ run, the gate fails loudly.
 | `scripts/sandbox.sh` | The one entry command (argument handling, isolation profile, volumes, modes). |
 | `docker/Dockerfile` | Pinned image: digest-pinned Rust base, per-arch SHA-verified Herdr 0.9.0, non-root user. |
 | `docker/selfcheck.sh`, `docker/lib.sh` | The in-container isolation proof and shared mount audit. |
-| `docker/gates.sh` | Gate sequence with named first failure and e2e evidence export. |
+| `docker/gates.sh` | Gate sequence with named first failure. |
 | `docker/prepare.sh` | Dependency fetch + `board` build (network-enabled step). |
 | `docker/env-entrypoint.sh` | Persistent environment container (Herdr server). |
 | `docker/agent-prepare.sh`, `docker/agent-entrypoint.sh`, `docker/agent-run.sh`, `docker/agy-pin.txt` | Real-provider agent mode: pinned CLI install (SHA-verified agy tarball), credential symlinking + fail-closed integration preflight, and the in-container one-shot/seed runner. |
 | `docker/lock.sh` | Lockfile regeneration through a single-file write-back mount. |
-| `scripts/tests/test_sandbox.py` | Daemon-free contract tests: arguments, isolation defaults, pinning, cleanup, refusals. |

@@ -6,9 +6,8 @@ welcome. For the full cross-agent contributor guide (crate ownership, herdr gotc
 
 ## Development setup
 
-Requirements: a **Rust toolchain** (stable, edition 2021) and exactly **Herdr 0.9.0 with
-socket protocol 22** on `PATH` for the end-to-end path (unit and integration tests need neither
-herdr nor an agent harness).
+Requirements: a **Rust toolchain** (stable, edition 2021). Running the application also requires
+exactly **Herdr 0.9.0 with socket protocol 22** on `PATH`.
 
 ```bash
 git clone https://github.com/nelsonPires5/herdr-board
@@ -37,8 +36,7 @@ prompts, config, harness adapters), `board-daemon` (orchestration and dispatch),
 The CLI and TUI share the typed `board_core::client::BoardClient`; only boardd touches SQLite.
 Design and protocol: [`docs/design.md`](docs/design.md) and [`docs/protocol.md`](docs/protocol.md);
 index: [`docs/README.md`](docs/README.md). `schema.sql` is the SQLite migration source of truth;
-`scripts/` holds build/install helpers; `e2e/` holds optional live diagnostics against disposable
-Herdr sessions and workspaces.
+`scripts/` holds build/install helpers.
 
 ## Checks
 
@@ -61,9 +59,6 @@ source-shape, and duplicate invariant tests.
 
 - **Unit + integration:** `cargo test --workspace --all-features`. The daemon integration tests use
   `LocalSpawner` + a fake harness script, so they run without a live herdr.
-- **End-to-end:** `e2e/run-all.sh` (compat wrapper: `scripts/e2e.sh`) drives a REAL herdr
-  with a scenario suite on **disposable** workspaces and an isolated temp DB + socket, tearing down
-  on exit. Not part of CI. Read `docs/testing.md` first; never aim it at a workspace you care about.
 
 ## Adding a harness adapter
 
