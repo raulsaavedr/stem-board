@@ -1,23 +1,18 @@
 # AGENTS.md
 
-Cross-agent contributor guide for herdr-board. Read this before touching the repo. herdr-board is a
+Contributor guide for Stem Board. Stem Board is a
 kanban board that dispatches AI coding agents into visible herdr panes; the single `board` binary is
 TUI + daemon + CLI. Rust, cargo workspace, edition 2021, all crates share the workspace version.
 Feature PRs target the long-lived `dev` branch; `main` is production (branch model:
 [`docs/releasing.md`](docs/releasing.md)).
 
-## Development workflow (sandbox-first)
+## Development workflow
 
-Local test and development runs use the Docker sandbox by default:
-`./scripts/sandbox.sh gates` runs every gate and the live E2E suite in an isolated,
-network-disabled, non-root container with the worktree read-only (setup, modes, and
-troubleshooting: [`docs/sandbox.md`](docs/sandbox.md)). Do **not** run `cargo test`,
-`e2e/run-all.sh`/`e2e/ci.sh`, the TUI, or real-provider agent runs directly against the host
-Herdr/board — that conflicts with the user's active environment. Follow the
-[`development-workflow` skill](.agents/skills/development-workflow/SKILL.md) for the
-edit-test loop, interactive shell/board CLI/TUI, the explicit opt-in real-provider agent
-mode (pi/codex/antigravity), visual validation through the sandbox, and the handoff
-checklist. Host-side execution is an explicit, documented exception only.
+Keep the normal loop small: `cargo fmt --all --check`,
+`cargo clippy --workspace --all-targets --all-features -- -D warnings`, and
+`cargo test --workspace --all-features`. `./scripts/sandbox.sh gates` runs that same set in an
+isolated container. Use the optional `e2e/` tools only when a change genuinely needs a live Herdr
+session, and never point them at user data.
 
 ## Workspace layout & crate ownership
 
@@ -31,43 +26,19 @@ checklist. Host-side execution is an explicit, documented exception only.
 
 Ownership is strict: edit your crate(s) + append to root `[workspace.dependencies]`. Semantics
 source of truth: `docs/protocol.md` + `docs/design.md`. Docs live in `docs/` (index: `docs/README.md`);
-`schema.sql` is the fresh-schema source of truth and `board-core::db` owns upgrades. Final compatibility
-schema v15
-live catalog is `e2e/README.md` (scenarios 01–39); `e2e/test-harness.sh` is the provider-free static
-safety gate.
+`schema.sql` is the fresh-schema source of truth and `board-core::db` owns upgrades. Optional live
+scenarios are documented in `e2e/README.md`.
 
-## Build / test gates (keep green)
+## Build and test
 
-The gate list has one maintained copy: **[`docs/README.md` → Test gates](docs/README.md#test-gates-single-source)**
-(mirrored by `.github/workflows/ci.yml`; `scripts/tests/test_docs.py` fails if the two drift).
+Tests should exercise product behavior through the smallest useful public surface. Do not add
+repository-policy, documentation-contract, source-shape, or duplicated invariant tests. Ignored
+tests and `e2e/` scenarios are opt-in diagnostics, not blanket merge requirements.
 
-- The Python tier is a CI gate too (`ci.yml`'s `Python tests` step) and is easy to forget:
-  `scripts/tests/test_docs.py` pins the version matrix (schema v15, protocol 22, Herdr 0.9.0)
-  and the exact `e2e/NN-*.sh` catalog, so adding a scenario or bumping the schema fails here
-  until the docs and that test are updated together.
+## Code ownership
 
-- `#[ignore]`'d tests hit a live herdr (run only when `HERDR_SOCK`/`HERDR_SOCKET_PATH` exists).
-- End-to-end: `e2e/run-all.sh` (compat: `scripts/e2e.sh`) drives a REAL Herdr; checked-in fake
-  Pi/Claude/Codex/OpenCode/Antigravity (`agy`) executables keep the standard suite (scenarios 01–39) provider-free and zero-cost.
-  **Hard rules an agent must never violate:** run only against the scenario's own **ephemeral**
-  `hb-e2e-<slug>-<pid>-<random64>` session and **disposable** workspaces it created — never a user
-  session, workspace, or tab — and prefix every Herdr mutation with `HERDR MUTATION:`.
-  The full isolation, identity-token, and cleanup design is in
-  [`docs/testing.md`](docs/testing.md) ("How it stays isolated and safe") — read it before
-  touching the harness.
-
-## Testing policy (pragmatic)
-
-Full layering, test placement, harness details, and how to add tests live in
-[`docs/testing.md`](docs/testing.md).
-
-- **Test-first for behavior.** For any behavior change, write the failing test first
-  (red→green) in the owning crate's existing style. Behavior through a public API belongs in
-  `crates/<crate>/tests/`, where it is compiled as an external client. A test that deliberately
-  checks a private invariant stays adjacent to its implementation under `src/` in a
-  `#[cfg(test)]` module; do not make production internals public just to relocate such a test.
-- **Responsibility-oriented modules.** Put new code behind the boundary that already owns the
-  responsibility rather than growing an entry-point file. The current stable boundaries:
+Put new code behind the boundary that already owns the responsibility rather than growing an
+entry-point file. The current stable boundaries:
 
   | Crate | Boundary | Owns |
   |---|---|---|
@@ -87,21 +58,10 @@ Full layering, test placement, harness details, and how to add tests live in
   | | `client/` | traits, Unix transport, fake client |
   | `board-herdr` | `events/` | event parsing and streams |
 
-  Before adding a helper, check `board-core` for one: `Patch::from_flags`/`from_option`,
-  `protocol::parse_timestamp`, `capability::default_capabilities`, `engine::resolve_column`,
-  `engine::run_elapsed`, `Comment::is_system`, `paths::session_name_from_socket`, and
-  `Db::require_card`/`require_column` are shared primitives, not per-crate copies.
+Before adding a helper, check `board-core` for shared primitives first.
 
-  Keep private tests beside those boundaries; describe ownership rather than maintaining a
-  file-by-file test manifest.
-- **New herdr-touching flow ⇒ e2e.** Any new user-visible flow that reaches herdr isn't done until
-  it has a use case documented and a live scenario under `e2e/` (per `docs/testing.md` and
-  `e2e/README.md`).
-- **Trivial changes are exempt** — docs, comments, typos, pure renames need no new test.
-- **Green before handoff.** The gates above **and** `e2e/run-all.sh` must pass (all scenarios
-  PASS — the suite boots its own ephemeral session(s), so 03-sessions no longer skips) before
-  handing a change off. The configured runner's residual orphan-script limitation remains
-  documented; it is not silently treated as a cleanup guarantee.
+Keep private tests beside those boundaries; describe ownership rather than maintaining a
+file-by-file test manifest.
 
 ## Conventions
 
@@ -122,7 +82,8 @@ Full layering, test placement, harness details, and how to add tests live in
 - Auto-start creates one child process-group leader (no double-fork/`setsid`); stop is an exact
   socket/identity-gated operation. The active-run summary drives TUI timers, and the always-on
   per-session supervisor reconnects and reconciles conservatively.
-- Definition of done for a user-facing change: update the docs and `CHANGELOG.md` in the same change. `Unreleased` entries are grouped under Keep-a-Changelog categories (`### Added` / `### Changed` / `### Fixed` / `### Removed`), one entry per PR, and each entry is one short sentence of user-facing outcome — what the user can do or see, never env var names, internal flags, module names, or tuning numbers (an internal refactor with no visible change gets one short line or none). Every entry starts with the clickable PR link — GitHub does not auto-link bare `#NN` inside rendered markdown — and fits ≤ 200 chars total: `- [#31](https://github.com/nelsonPires5/herdr-board/pull/31) feat: Pin Herdr plugin installs to a released tag.` The PR body holds the rationale. `scripts/tests/test_docs.py` enforces these rules for `Unreleased` (released sections are exempt). Write the entry first, then fill in the PR link once the PR is open.
+- Definition of done for a user-facing change: update the relevant docs and add a concise
+  `CHANGELOG.md` entry when it helps users understand the release.
 - Release/version changes follow [`docs/releasing.md`](docs/releasing.md). Agents must never create,
   push, move, or delete release tags manually: a maintainer starts **Prepare Release**, merges its
   PR into `dev`, the **Promote** workflow merges `dev -> main`, and the **Release** workflow creates

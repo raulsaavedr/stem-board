@@ -8,15 +8,15 @@ This repo has two long-lived branches and three workflows:
 | `main` | production, the default branch, and the **only** branch the Release workflow publishes from |
 
 1. **Prepare Release** is manually dispatched with `patch`, `minor`, or `major`, plus a `base`
-   (default `dev`; `main` only for hotfixes). It runs the stdlib-only Python tests, updates the
-   release files, verifies them, runs the Rust gates, and creates or updates `release/vX.Y.Z`
+   (default `dev`; `main` only for hotfixes). It updates and verifies the release files, runs the
+   normal Rust checks, and creates or updates `release/vX.Y.Z`
    plus its PR against the selected base.
 2. **Release** is triggered by a completed **CI workflow run whose event was a push to `main`**.
    It checks the exact green run SHA and publishes only when the workspace version changed in
    `Cargo.toml` versus that commit's first parent.
 
-A normal commit is a successful no-op. The unchanged Release workflow still consumes the existing
-`CI` result; that result now includes the provider-free live E2E job before publication can begin.
+A normal commit is a successful no-op. The Release workflow consumes the normal `CI` result before
+publication can begin.
 
 ## Branch model
 
@@ -31,8 +31,8 @@ Normal release flow:
 
 1. A maintainer starts **Prepare Release** with the bump; the default base is `dev`. The workflow
    cuts `release/vX.Y.Z` from `dev` and opens (or updates) its PR to `dev`.
-2. The PR is reviewed and merged into `dev` with a merge commit. CI runs on that `dev` push —
-   the full workflow including the dependent live E2E job — but never publishes.
+2. The PR is reviewed and merged into `dev` with a merge commit. CI runs on that `dev` push but
+   never publishes.
 3. The **Promote** workflow opens the `dev -> main` promotion PR; a maintainer merges it with a
    merge commit. CI runs on the merge into `main`.
 4. The **Release** workflow consumes the green `main` CI run, sees the version bump versus the
@@ -77,7 +77,7 @@ A maintainer manually starts **Prepare Release**, selects the bump, and picks th
 default, `main` for hotfixes). The workflow computes the target from `Cargo.toml`, cuts
 `release/vX.Y.Z` from the selected base, reuses the same branch/PR on reruns (retargeting the PR
 to the current base if it changed), applies the four release files atomically one file at a time,
-runs Python/Rust tests, then explicitly dispatches CI for the branch. GitHub credentials are
+runs the normal Rust checks, then explicitly dispatches CI for the branch. GitHub credentials are
 disabled for checkout and supplied only to steps that need GitHub API/git access.
 
 The PR must be reviewed and merged into its base. Dispatching CI on the branch is useful proof,
@@ -98,8 +98,8 @@ merges) is a no-op.
 ## main protection
 
 `main` is protected by an active branch ruleset: every change must come through a pull request
-merged with a **merge commit** (squash/rebase are not allowed), and the six fast CI jobs are
-required status checks with a strict policy. Direct pushes to `main` are blocked by the
+merged with a **merge commit** (squash/rebase are not allowed), and CI is a required status check.
+Direct pushes to `main` are blocked by the
 pull-request rule; the only writers in practice are maintainers merging PRs (promotion, hotfix,
 back-merge) with GitHub-verified merge commits. `dev` is protected the same way
 (PR + merge commit + required checks). There is no signature requirement on either branch: the
@@ -116,8 +116,7 @@ usual and the PR becomes mergeable.
 
 ## Release gate
 
-The Release workflow consumes only a successful CI `workflow_run`—including its dependent live E2E
-job—satisfying all of these:
+The Release workflow consumes only a successful CI `workflow_run` satisfying all of these:
 
 - `workflow_run.event == push` and `head_branch == main`;
 - `Cargo.toml` version at `head_sha` differs from the version at `head_sha^1`.

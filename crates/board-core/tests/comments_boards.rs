@@ -1,8 +1,4 @@
-//! RED contract tests for board identity and comment lifecycle semantics.
-//!
-//! These are intentionally written against the public `Db` surface.  The
-//! daemon/client layers must preserve the same rules when they expose the
-//! corresponding typed protocol methods.
+//! Board identity and comment lifecycle behavior through the public database API.
 
 use board_core::db::{Db, BOARD_ID};
 use board_core::protocol::{CardCreateParams, CardVisibility};
@@ -204,7 +200,7 @@ fn agent_comment_ownership_survives_edits_and_history() {
 }
 
 #[test]
-fn active_all_and_archived_visibility_has_one_shared_contract() {
+fn active_all_and_archived_visibility_share_the_same_behavior() {
     let db = mem();
     let active = card(&db, "active");
     let archived = card(&db, "archived");

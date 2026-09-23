@@ -166,11 +166,10 @@ prefix is `ctrl+a`, it is `Ctrl+A Shift+K`). Do not reuse `prefix+k` — it is H
 
 ## Developing in the Docker sandbox
 
-Contributors and coding agents can run the complete test gates — including every live E2E scenario
-against a container-local Herdr — without touching the host's active Herdr, board daemon, or
-sessions: `./scripts/sandbox.sh prepare` once, then `./scripts/sandbox.sh gates` after every edit.
+Contributors can run the normal Rust checks without touching the host's active Herdr, board daemon,
+or sessions: `./scripts/sandbox.sh prepare` once, then `./scripts/sandbox.sh gates`.
 It also opens shells, runs `board` CLI commands and the interactive TUI against the isolated
-environment, and gates real-provider agent dispatches (pi/codex/antigravity) behind an explicit
+environment, and keeps real-provider agent dispatches (pi/codex/antigravity) behind an explicit
 opt-in with the provider credentials mounted read-only. Works with Docker
 Engine on Linux and Colima on macOS, on amd64 and arm64. See
 [`docs/sandbox.md`](docs/sandbox.md).
@@ -307,9 +306,8 @@ The exit status carries the same number, so scripts branch on `$?` instead of pa
 | `64` | The CLI itself refused — usage/parse error, declined confirmation, bad enum value, unresolvable column, missing `$BOARD_CARD_ID` (`EX_USAGE`) |
 | `70` | Daemon reported a protocol code outside `1..=5`, clamped (`EX_SOFTWARE`) |
 
-- [`docs/README.md`](docs/README.md) — the documentation index (design, protocol, herdr facts,
-  testing, releasing), the single source of the
-  [test gates](docs/README.md#test-gates-single-source), and the `e2e/` catalog (scenarios 01–39);
+- [`docs/README.md`](docs/README.md) — the documentation index for design, protocol, testing, and
+  releasing;
 - [`docs/configuration.md`](docs/configuration.md) — `config.toml`, `[daemon]` settings,
   config-defined harnesses, and every environment variable;
 - [`docs/operations.md`](docs/operations.md) — update, uninstall, and local-development

@@ -163,9 +163,8 @@ cell attributes, or a real screenshot under the user's terminal palette.
   worktree and repeat isolated validation; never create a second
   implementation worktree.
 - Add reducer/layout tests for behavior, not only screenshots.
-- Run focused tests and clippy after each interaction change (Route A:
-  `scripts/sandbox.sh gates <filter>` for e2e subsets, or the full `gates`
-  before handoff).
+- Run focused tests after each interaction change and the normal `scripts/sandbox.sh gates` before
+  handoff.
 - Rebuild and restart the disposable plugin pane/TUI so screenshots use the
   new binary.
 - Preserve the approved final prototype diff until promotion.
@@ -183,10 +182,8 @@ target and must not create or port into another worktree.
 3. Update/add deterministic snapshots, including wide/narrow and overflow
    states.
 4. Update README, design docs, and `CHANGELOG.md` in the same change.
-5. Run all repository gates and live e2e — in Route A,
-   `scripts/sandbox.sh gates` (fmt → clippy → `cargo test --workspace
-   --all-features` → python tier → `e2e/test-harness.sh` → `run-all.sh
-   --require-all`).
+5. Run `scripts/sandbox.sh gates` (fmt, clippy, and the Rust workspace tests). Use a focused live
+   scenario only when the changed behavior needs it.
 6. Review the final diff for accidental prototype paths, fixture data, or
    generated artifacts.
 

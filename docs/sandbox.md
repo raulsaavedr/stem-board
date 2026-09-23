@@ -1,7 +1,6 @@
-# Docker sandbox for isolated gates and E2E
+# Docker sandbox
 
-`scripts/sandbox.sh` is a local developer tool that runs the repository's test
-gates — including the full provider-free live Herdr E2E suite — inside a
+`scripts/sandbox.sh` is a local developer tool that runs the normal Rust checks inside a
 disposable Docker container, so an agent or a human can iterate on a worktree
 without touching the host's active Herdr sessions, board daemon, sockets,
 databases, or workspaces.
@@ -32,7 +31,7 @@ image is rebuilt automatically when the `docker/` directory changes.
 
 ```bash
 scripts/sandbox.sh prepare   # once per worktree: image, volumes, dependency fetch
-scripts/sandbox.sh gates     # the full deterministic suite, offline
+scripts/sandbox.sh gates     # normal Rust checks, offline
 ```
 
 `gates` runs, inside one isolated container:
@@ -41,12 +40,7 @@ scripts/sandbox.sh gates     # the full deterministic suite, offline
 2. `cargo fmt --all --check`,
 3. `cargo clippy --workspace --all-targets --all-features -- -D warnings`,
 4. `cargo test --workspace --all-features`,
-5. the Python test tier (`scripts/tests`),
-6. the static harness gate (`e2e/test-harness.sh`),
-7. all provider-free live Herdr scenarios via `e2e/run-all.sh --require-all`.
-
-The first failing gate is named and the exit code is non-zero; a failing E2E
-scenario is identified by the suite's own summary. `prepare` is the only step
+The first failing gate is named and the exit code is non-zero. `prepare` is the only step
 that uses the network (dependency fetch + image build); `gates` runs with the
 network disabled entirely and has no LLM cost.
 
@@ -56,13 +50,8 @@ Build output, Cargo caches, databases, sockets, logs, and artifacts live in
 per-worktree Docker volumes outside the repository — repeated runs reuse the
 caches and the repository stays clean.
 
-Iterate on a subset of scenarios by passing filters (substring match, forwarded
-to `run-all.sh`):
-
-```bash
-scripts/sandbox.sh gates 03-sessions
-scripts/sandbox.sh gates 16- 17-          # several at once
-```
+Focused live scenarios remain available directly through `e2e/run-all.sh`; they are not part of
+the normal `gates` command.
 
 If `Cargo.toml` changed and the lockfile is stale, `prepare` refuses with a
 hint; regenerate it in a network container without ever mounting the repo

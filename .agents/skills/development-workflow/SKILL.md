@@ -1,6 +1,6 @@
 ---
 name: development-workflow
-description: Default sandbox-first developer workflow for herdr-board. Run every test gate and the live Herdr E2E suite through scripts/sandbox.sh in an isolated, network-disabled, non-root container (worktree read-only); never run cargo tests, the live E2E suite, the TUI, or real-provider agent runs directly against the host Herdr/board. Covers the one-command edit-test loop, interactive shell/board CLI/TUI, the explicit opt-in real-provider agent mode (pi/codex/antigravity), artifact/cache housekeeping, and the visual-validation stage (references/visual-validation.md) for TUI work through the sandbox.
+description: Sandbox-first workflow for Stem Board. Run the normal Rust checks in an isolated container and use live Herdr/provider tools only as explicit, focused diagnostics.
 ---
 
 # Development workflow (sandbox-first)
@@ -9,7 +9,7 @@ Use this skill for any development work in a herdr-board worktree: editing code,
 running tests, exercising the CLI/TUI, or shepherding a change to a PR. Running
 tests on the host conflicts with the user's active Herdr, board daemon, sockets,
 sessions, and workspaces — so this repository's default is the **Docker sandbox**
-(`scripts/sandbox.sh`), which runs the complete deterministic gate set in a
+(`scripts/sandbox.sh`), which runs the normal Rust check set in a
 disposable, network-disabled, non-root container with the worktree mounted
 read-only. Supported hosts: Docker Engine on Linux, Colima on macOS, amd64 and
 arm64.
@@ -45,25 +45,11 @@ sandbox path is strictly safer and strictly equivalent in coverage.
 
 ```bash
 ./scripts/sandbox.sh prepare   # once per worktree: image, volumes, dependency fetch (only network step)
-./scripts/sandbox.sh gates     # the full deterministic suite, offline
+./scripts/sandbox.sh gates     # fmt, clippy, and Rust tests, offline
 ```
 
-`gates` runs, in order, and **stops at the first failing gate, naming it**
-(non-zero exit): safety self-check → `cargo fmt --all --check` → clippy
-(`--workspace --all-targets --all-features -- -D warnings`) → workspace tests →
-Python tests (`scripts/tests`) → static harness gate (`e2e/test-harness.sh`) →
-all provider-free live Herdr E2E scenarios (`e2e/run-all.sh --require-all`,
-which identifies any failing scenario and runs its own identity/cleanup
-guards). The e2e run is teed to the artifacts volume and the suite's evidence
-root is exported for `artifacts`.
-
-Iterate on a subset of scenarios with filters (substring match, forwarded to
-`run-all.sh`):
-
-```bash
-./scripts/sandbox.sh gates 03-sessions
-./scripts/sandbox.sh gates 16- 17-
-```
+`gates` runs the isolation self-check, formatting, clippy, and the Rust workspace tests. Live E2E
+scenarios are opt-in diagnostics and are run directly from `e2e/` only when a change needs them.
 
 Edits on the host are visible on the next `gates` run **without any image
 rebuild** (the worktree is a read-only bind mount). Repeated runs reuse the

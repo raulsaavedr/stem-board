@@ -1,6 +1,4 @@
-//! Project/board selection contract: persistent selection, per-project board
-//! selection, recency capped at three, and the open/create/select side-effect
-//! rules (queries and moves never touch recency).
+//! Project and board selection behavior, including persistence and recency.
 
 use board_core::db::Db;
 
