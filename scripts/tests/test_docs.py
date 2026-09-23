@@ -26,7 +26,7 @@ INSTALL_REF_DOCS = ("README.md", "docs/install.md", "docs/operations.md")
 # sections document the conventions of their time and are never rewritten.
 CHANGELOG_CATEGORIES = ("### Added", "### Changed", "### Fixed", "### Removed")
 CHANGELOG_ENTRY_RE = re.compile(
-    r"^\- \[#(\d+)\]\(https://github\.com/nelsonPires5/herdr-board/pull/\d+\)"
+    r"^\- \[#(\d+)\]\(https://github\.com/raulsaavedr/stem-board/pull/\d+\)"
 )
 CHANGELOG_ENTRY_MAX_CHARS = 200
 
@@ -360,7 +360,7 @@ class DocumentationContractTests(unittest.TestCase):
                 self.assertIsNotNone(
                     CHANGELOG_ENTRY_RE.match(stripped),
                     "entry must start with `- [#NN](https://github.com/"
-                    "nelsonPires5/herdr-board/pull/NN)`: " + stripped[:60],
+                    "raulsaavedr/stem-board/pull/NN)`: " + stripped[:60],
                 )
                 self.assertLessEqual(
                     len(stripped),

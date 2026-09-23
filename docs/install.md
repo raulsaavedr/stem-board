@@ -50,7 +50,7 @@ Stem installs the same plugin manifest but prefers the release executable declar
 `[prebuilt]` section:
 
 ```bash
-stem plugin install nelsonPires5/herdr-board --ref v0.17.0 --yes
+stem plugin install raulsaavedr/stem-board --ref v0.17.0 --yes
 ```
 
 Stem verifies the matching asset against the release's `SHA256SUMS` before placing it at the
