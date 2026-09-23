@@ -9,7 +9,7 @@ links here; release *policy* (how a version is cut and tagged) lives in
 For a Stem-managed installation pinned to a release, choose the newer tag explicitly:
 
 ```bash
-stem plugin install raulsaavedr/stem-board --ref v0.17.0 --yes
+stem plugin install raulsaavedr/stem-board --ref v0.17.1 --yes
 ```
 
 `stem plugin update stem-board` refreshes the recorded ref but intentionally keeps a pinned tag
@@ -20,7 +20,7 @@ Re-run the install command to update — Herdr has no separate update command, s
 existing plugin:
 
 ```bash
-herdr plugin install nelsonPires5/herdr-board --ref v0.17.0 --yes
+herdr plugin install nelsonPires5/herdr-board --ref v0.17.1 --yes
 ```
 
 The build step requests a graceful stop (`board daemon --stop`) before recompiling, so the new

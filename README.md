@@ -96,13 +96,13 @@ state is never modified.
 With Herdr (builds from source):
 
 ```bash
-herdr plugin install nelsonPires5/herdr-board --ref v0.17.0
+herdr plugin install nelsonPires5/herdr-board --ref v0.17.1
 ```
 
 With Stem 0.1.0-beta.14 or newer (downloads a verified prebuilt when available):
 
 ```bash
-stem plugin install raulsaavedr/stem-board --ref v0.17.0 --yes
+stem plugin install raulsaavedr/stem-board --ref v0.17.1 --yes
 ```
 
 Open the board:

@@ -50,7 +50,7 @@ Stem installs the same plugin manifest but prefers the release executable declar
 `[prebuilt]` section:
 
 ```bash
-stem plugin install raulsaavedr/stem-board --ref v0.17.0 --yes
+stem plugin install raulsaavedr/stem-board --ref v0.17.1 --yes
 ```
 
 Stem verifies the matching asset against the release's `SHA256SUMS` before placing it at the
@@ -65,7 +65,7 @@ binary, registers the plugin, and copies the CLI to `~/.local/bin/board` as a re
 After reviewing the manifest and scripts, a noninteractive install is available:
 
 ```bash
-herdr plugin install nelsonPires5/herdr-board --ref v0.17.0 --yes
+herdr plugin install nelsonPires5/herdr-board --ref v0.17.1 --yes
 ```
 
 Set `HERDR_BOARD_CLI_INSTALL_DIR` to an absolute user bin directory before installing to override
