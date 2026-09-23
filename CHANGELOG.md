@@ -6,6 +6,14 @@ All notable changes to this project are documented here. The format is based on
 
 ## [Unreleased]
 
+### Added
+
+- [#2](https://github.com/raulsaavedr/stem-board/pull/2) feat: publish verified Stem Board binaries for macOS ARM64 and Linux ARM64/x86_64, with source fallback when unavailable.
+
+### Changed
+
+- [#2](https://github.com/raulsaavedr/stem-board/pull/2) chore: keep routine CI focused on formatting, linting, and product tests; live scenarios are opt-in diagnostics.
+
 ## [0.17.0] - 2026-09-13
 
 ### Added

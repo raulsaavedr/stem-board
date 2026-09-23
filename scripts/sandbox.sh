@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 # herdr-board Docker sandbox — one entry point for isolated edit-test cycles.
 #
-# Runs the repository's deterministic gate set (including every provider-free
-# live Herdr e2e scenario) inside a disposable, network-disabled, non-root
+# Runs the repository's normal Rust checks inside a disposable, network-disabled, non-root
 # container; provides a persistent container-local Herdr + board daemon for
 # shell/CLI/TUI use; and gates real-provider agent dispatches (pi/codex/
 # antigravity) behind an explicit network + read-only credential opt-in.
@@ -32,11 +31,7 @@ Global flags:
   -h, --help                 Show this help
 
 Subcommands:
-  gates [filter...]          Full deterministic suite offline: safety self-check,
-                             fmt, clippy, workspace tests, python tests, static
-                             harness gate, and all provider-free live Herdr e2e
-                             scenarios (--require-all). Filters pass through to
-                             e2e/run-all.sh (substring match).
+  gates                     Isolation self-check, fmt, clippy, and Rust tests
   prepare                    Build the image if stale, create volumes, fetch
                              dependencies (network used only here), build board
   selfcheck                  Run the in-container isolation proof standalone
@@ -68,7 +63,6 @@ Subcommands:
 Examples:
   scripts/sandbox.sh prepare
   scripts/sandbox.sh gates
-  scripts/sandbox.sh gates 03-sessions        # e2e iteration on one scenario
   scripts/sandbox.sh board card list --json
   scripts/sandbox.sh agent --provider pi --allow-network
   scripts/sandbox.sh agent --provider codex --allow-network --model gpt-5.6-luna --effort low
@@ -282,9 +276,10 @@ require_board_binary() {
 # ---------------------------------------------------------------------------
 cmd_gates() {
   sandbox_ready
-  info "running the full deterministic gate set offline (network disabled)"
-  run_isolated gates.sh "$@"
-  info "gates: PASS — artifacts available via: scripts/sandbox.sh artifacts"
+  [ "$#" -eq 0 ] || die "gates takes no arguments; run focused e2e scenarios directly from e2e/"
+  info "running fmt, clippy, and Rust tests offline (network disabled)"
+  run_isolated gates.sh
+  info "gates: PASS"
 }
 
 cmd_prepare() {

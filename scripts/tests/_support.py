@@ -1,14 +1,4 @@
-"""Shared plumbing for the `scripts/tests` suite.
-
-The Python tier is a CI gate (`.github/workflows/ci.yml` → `Python tests`) made
-of independent contract suites. They all need the same three things — the repo
-root, a way to drop an executable stub into a temp directory, and a way to run a
-bash snippet with a controlled environment — which used to be recomputed and
-re-implemented in each file under two different names (`ROOT` / `REPO_ROOT`).
-
-This module is deliberately dependency-free and is not collected by the
-`test_*.py` discovery pattern.
-"""
+"""Shared plumbing for optional script and harness tests."""
 from __future__ import annotations
 
 import os

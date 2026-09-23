@@ -1,12 +1,10 @@
-//! RED migration contract for the v12 -> v14 upgrade (comment audit schema
-//! plus the projects/selection schema).
+//! Migration coverage for the v12 schema through the current schema.
 
 use board_core::db::Db;
 use rusqlite::Connection;
 
-// Keep the fixture deliberately independent from the current fresh-schema
-// path.  This is the public `Db::open` migration boundary, not a private
-// migration-function test.
+// Keep the fixture independent from the current fresh-schema path so the test
+// exercises an actual database upgrade through `Db::open`.
 const V12_SCHEMA: &str = r#"
 PRAGMA foreign_keys = ON;
 CREATE TABLE boards (
